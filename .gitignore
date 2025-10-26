@@ -1,0 +1,17 @@
+results/
+models/
+figures/
+baselines/
+dataset/
+train/
+*.png
+*.pdf
+*.log
+*.csv
+*.out
+test*
+__pycache__/
+*.pyc
+.vscode
+FSPN/
+postgresql*/
