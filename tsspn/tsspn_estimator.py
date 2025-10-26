@@ -5,19 +5,36 @@ import time
 
 import numpy as np
 import pandas as pd
-from FSPN.Structure.nodes import Leaf
-from estimator import CardinalityEstimator
 
 from spn.structure.Base import bfs, get_nodes_by_type, Leaf
 from spn.structure.StatisticalTypes import MetaType
 
-from evaluation.utils import parse_query
+from tsspn.utils.utils import parse_query
 from tsspn.algorithms.ranges import NominalRange, NumericRange
 from tsspn.learning.tsspn_learning import create_custom_leaf
 from tsspn.structure.base import Product, TSProduct
 from tsspn.structure.discrete_multi_histogram import DiscreteMultiHistogram, create_discrete_multi_histogram_leaf
 
 logger = logging.getLogger(__name__)
+
+
+class CardinalityEstimator:
+    def __init__(self, name, schema, overwrite=False):
+        self.name = name
+        self.schema = schema
+        self.overwrite = overwrite
+
+    def estimate_points(self, query):
+        raise NotImplementedError
+
+    def estimate_series(self, query):
+        metric_start_idx = query.find(" AND " + self.schema.metric)
+        query = query[:metric_start_idx] + ";"
+        pred_points, infer_time = self.estimate_points(query)
+        return self.schema.n_series * pred_points / self.schema.n_points, infer_time
+
+    def get_model_size():
+        raise NotImplementedError
 
 class TSSPNEstimator(CardinalityEstimator):
     def __init__(self, schema, model_path, overwrite=False):
